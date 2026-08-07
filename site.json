@@ -1,1 +1,16 @@
-
+{
+  "sites": [
+    {
+      "name": "Google",
+      "url": "https://www.google.com"
+    },
+    {
+      "name": "Wikipedia",
+      "url": "https://www.wikipedia.org"
+    },
+    {
+      "name": "Khan Academy",
+      "url": "https://www.khanacademy.org"
+    }
+  ]
+}
