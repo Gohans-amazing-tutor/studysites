@@ -12,83 +12,74 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
             padding: 20px;
         }
 
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-        }
-
         h1 {
-            color: #333;
-            margin-bottom: 30px;
             text-align: center;
-            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #333;
         }
 
-        .links-grid {
+        .sections-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+        }
+
+        .section h2 {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            margin: -20px -20px 15px -20px;
+            font-size: 18px;
         }
 
         .link-button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #007bff;
             color: white;
             border: none;
-            padding: 15px 20px;
-            border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-size: 14px;
             text-align: center;
         }
 
         .link-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            background-color: #0056b3;
         }
 
-        .link-button:active {
-            transform: translateY(0);
+        @media (max-width: 900px) {
+            .sections-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
-        .error {
-            color: #e74c3c;
-            text-align: center;
-            padding: 20px;
-            background: #fadbd8;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
-
-        .loading {
-            text-align: center;
-            color: #667eea;
-            font-size: 18px;
+        @media (max-width: 600px) {
+            .sections-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📚 Study Sites</h1>
-        <div id="links-container" class="loading">Loading sites...</div>
-    </div>
+    <h1>Study Sites</h1>
+    <div class="sections-container" id="sections-container"></div>
 
     <script>
-        // Fetch and load sites from JSON
         async function loadSites() {
             try {
                 const response = await fetch('site.json');
@@ -96,45 +87,41 @@
                     throw new Error('Failed to load site.json');
                 }
                 const data = await response.json();
-                displaySites(data.sites);
+                displaySites(data.sections);
             } catch (error) {
-                const container = document.getElementById('links-container');
-                container.innerHTML = `<div class="error">Error loading sites: ${error.message}</div>`;
                 console.error('Error:', error);
             }
         }
 
-        // Display sites as clickable buttons
-        function displaySites(sites) {
-            const container = document.getElementById('links-container');
+        function displaySites(sections) {
+            const container = document.getElementById('sections-container');
             container.innerHTML = '';
 
-            if (!sites || sites.length === 0) {
-                container.innerHTML = '<div class="error">No sites found in site.json</div>';
-                return;
-            }
+            sections.forEach(section => {
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = 'section';
 
-            const grid = document.createElement('div');
-            grid.className = 'links-grid';
+                const title = document.createElement('h2');
+                title.textContent = section.title;
+                sectionDiv.appendChild(title);
 
-            sites.forEach(site => {
-                const button = document.createElement('button');
-                button.className = 'link-button';
-                button.textContent = site.name;
-                button.onclick = () => {
-                    // Open URL in about:blank window
-                    const blankWindow = window.open('about:blank', '_blank');
-                    if (blankWindow) {
-                        blankWindow.location.href = site.url;
-                    }
-                };
-                grid.appendChild(button);
+                section.links.forEach(link => {
+                    const button = document.createElement('button');
+                    button.className = 'link-button';
+                    button.textContent = link.name;
+                    button.onclick = () => {
+                        const blankWindow = window.open('about:blank', '_blank');
+                        if (blankWindow) {
+                            blankWindow.location.href = link.url;
+                        }
+                    };
+                    sectionDiv.appendChild(button);
+                });
+
+                container.appendChild(sectionDiv);
             });
-
-            container.appendChild(grid);
         }
 
-        // Load sites when page loads
         document.addEventListener('DOMContentLoaded', loadSites);
     </script>
 </body>
